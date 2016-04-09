@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+
 from seismograph.runnable import RunnableGroup
 from seismograph.runnable import LayerOfRunnableObject
 from seismograph.runnable import ContextOfRunnableObject

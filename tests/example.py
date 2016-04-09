@@ -29,10 +29,14 @@ You should see output something like this:
     OK
 """
 
-import unittest
+# import unittest
+#
+#
+# class ExampleTestCase(unittest.TestCase):
+#
+#     def setUp(self):
+#         print 'Hello setUp!'
+#
+#     def test_smth1(self):
+#         print 'Hello test!'
 
-
-class ExampleTestCase(unittest.TestCase):
-
-    def test(self):
-        print 'Hello World!'
