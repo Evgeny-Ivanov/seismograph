@@ -9,7 +9,6 @@ class SeismographErrorTest(unittest.TestCase):
 
     def test_exception_message(self):
         my_message = "my message"
-        e_message = ''
 
         try:
             raise SeismographError(my_message)
