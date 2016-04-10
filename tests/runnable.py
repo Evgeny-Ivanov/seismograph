@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 
 from seismograph.runnable import RunnableGroup, RunnableObject, stopped_on, reason, is_run, run, BuildObjectMixin, \
     is_mount, MountObjectMixin, is_build, run_method, mount_method, build_method
 from seismograph.runnable import LayerOfRunnableObject
 from seismograph.runnable import ContextOfRunnableObject
-from mock import Mock
+from mock import Mock,patch
 
 
 def assertNotImplementedError(self, function, message, class_name):
@@ -17,7 +19,7 @@ def assertNotImplementedError(self, function, message, class_name):
                           .format(message, class_name))
 
 
-class TestClassRunnableGroup(unittest.TestCase):
+class RunnableGroupTestCase(unittest.TestCase):
     def setUp(self):
         self.testStringConfig = "testString1"
         self.testStringObjects = "testString2"
@@ -35,13 +37,13 @@ class TestClassRunnableGroup(unittest.TestCase):
         self.assertEquals(self.runnableGroup.objects, self.testStringObjects)
 
 
-class TestClassLayerOfRunnableObject(unittest.TestCase):
+class LayerOfRunnableObjectTestCase(unittest.TestCase):
     def test_function__init__(self):
         layerOfRunnableObject = LayerOfRunnableObject()
         self.assertEquals(layerOfRunnableObject.enabled, True)
 
 
-class TestContextOfRunnableObject(unittest.TestCase):
+class ContextOfRunnableObjectNotImplementedErrorTestCase(unittest.TestCase):
     def setUp(self):
         self.contextOfRunnableObject = ContextOfRunnableObject()
 
@@ -219,3 +221,40 @@ class TestClassRunnableObject(unittest.TestCase):
         mock.Value = lambda _1, _2: self.testString
         self.RunnableObject.support_mp(mock)
         self.assertEqual(self.RunnableObject._stopped_on, self.testString)
+
+
+class ContextOfRunnableObjectFunctionCallTestCase(unittest.TestCase):
+    def setUp(self):
+        self.contextOfRunnableObject = ContextOfRunnableObject()
+        self.contextOfRunnableObject.start_context = Mock()
+        self.contextOfRunnableObject.stop_context = Mock()
+        self.testString = "testString"
+
+    @patch("seismograph.runnable.stopped_on")
+    def test_function___call___contextmanager(self,mock_runnable_stopped_on):
+        mock_runnable_stopped_on.return_value = 'start_context'
+
+        with self.contextOfRunnableObject(self.testString) as value:
+            self.contextOfRunnableObject.start_context.assert_called_with(self.testString)
+            self.assertFalse(mock_runnable_stopped_on.called)
+            self.assertIsNone(value)
+
+        mock_runnable_stopped_on.assert_called_with(self.testString)
+
+    @patch("seismograph.runnable.stopped_on")
+    def test_function___call___not_start_context(self, mock_runnable_stopped_on):
+        mock_runnable_stopped_on.return_value = 'not start_context'
+
+        with self.contextOfRunnableObject(self.testString) as value:
+            pass
+
+        self.contextOfRunnableObject.stop_context.assert_called_with(self.testString)
+
+    @patch("seismograph.runnable.stopped_on")
+    def test_function___call___start_context(self, mock_runnable_stopped_on):
+        mock_runnable_stopped_on.return_value = 'start_context'
+
+        with self.contextOfRunnableObject(self.testString) as value:
+            pass
+
+        self.assertFalse(self.contextOfRunnableObject.stop_context.called)

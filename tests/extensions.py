@@ -11,27 +11,27 @@ from seismograph.extensions import ExtensionContainer,SingletonExtensionContaine
 from seismograph.program import Program
 from seismograph import config
 
-class TestExtensions(unittest.TestCase):
+class ExtensionsTestCase(unittest.TestCase):
     def setUp(self):
         self.testString = "testString"
         self.testItem = 0
 
         self._WAS_CLEAR = extensions._WAS_CLEAR
 
-    def test_functionInstall(self):
+    def test_function_install(self):
         mocker.__install__ = Mock()
         program = Program()
         install(mocker,program)
 
         mocker.__install__.assert_called_with(program)
 
-    def test_functionAdd_options(self):
+    def test_function_add_options(self):
         mocker.__add_options__ = Mock()
         parser = config.create_option_parser()
         add_options(mocker,parser)
         mocker.__add_options__.assert_called_with(parser)
 
-    def test_classExtensionContainer_get_properties(self):
+    def test_class_ExtensionContainer_get_properties(self):
         ext = self.testString
         args = tuple()
         kwargs = dict()
@@ -40,44 +40,44 @@ class TestExtensions(unittest.TestCase):
         self.assertEquals(extensionContainer.args,args)
         self.assertEquals(extensionContainer.kwargs,kwargs)
 
-    def test_ExtensionContainer___call__(self):
+    def test_class_ExtensionContainer___call__(self):
         extensionContainer = ExtensionContainer(ext=lambda  : self.testString)
         self.assertEquals(self.testString,extensionContainer())
 
-    def test_SingletonExtensionContainer___call__(self):
+    def test_class_SingletonExtensionContainer___call__(self):
         extensionContainer = SingletonExtensionContainer(ext=lambda  : self.testString)
         self.assertEquals(self.testString, extensionContainer())
 
-    def test_functionSet_is_data_True(self):
+    def test_function_set_is_data_True(self):
         set(ext=self.testString,name=self.testString,is_data=True,singleton=False)
         self.assertEquals(extensions._TMP[self.testString],self.testString)
 
-    def test_functionSet_is_data_False_singleton_True(self):
+    def test_function_set_is_data_False_singleton_True(self):
         set(ext=self.testString,name=self.testString,is_data=False,singleton=True)
         self.assertIsInstance(extensions._TMP[self.testString],SingletonExtensionContainer)
 
-    def test_functionSet_is_data_False_singleton_False(self):
+    def test_function_set_is_data_False_singleton_False(self):
         set(ext=self.testString,name=self.testString,is_data=False,singleton=False)
         self.assertIsInstance(extensions._TMP[self.testString],ExtensionContainer)
         self.assertNotIsInstance(extensions._TMP[self.testString],SingletonExtensionContainer)
 
 
-    def test_functionClear(self):
+    def test_function_clear(self):
         extensions._WAS_CLEAR = False
 
         extensions.clear()
         self.assertEquals(extensions._TMP,{})
         self.assertEquals(extensions._WAS_CLEAR,True)
 
-    def test_functionGet_raiseExtensionNotFound(self):
+    def test_function_get_raise_ExtensionNotFound(self):
         extensions._WAS_CLEAR = False
         self.assertRaises(extensions.ExtensionNotFound,get,self.testItem)
 
-    def test_functionGet_raiseRuntimeError(self):
+    def test_function_get_raise_RuntimeError(self):
         extensions._WAS_CLEAR = True
         self.assertRaises(RuntimeError,get,self.testItem)
 
-    def test_functionGet_InstanceExtensionContainer(self):
+    def test_function_get_instance_ExtensionContainer(self):
         class TestMock(Mock,ExtensionContainer):
             pass
         mock = TestMock(Mock())
@@ -88,7 +88,7 @@ class TestExtensions(unittest.TestCase):
         self.assertTrue(mock.called)
 
     def tearDown(self):
-        extensions._TMP.clear();
+        extensions._TMP.clear()
         extensions._WAS_CLEAR = self._WAS_CLEAR
 
 
